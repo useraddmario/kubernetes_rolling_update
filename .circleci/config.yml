@@ -70,6 +70,7 @@ workflows:
             - lint
       - aws-eks/create-cluster:
           cluster-name: capstone-cluster
+          show-eksctl-command: true
           context: aws
           requires:
             - build-and-push
