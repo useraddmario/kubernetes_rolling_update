@@ -30,7 +30,7 @@ metadata:
     service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
 spec:
   selector:
-    app: simple-web-app
+    app: todo-app
   ports:
     - port: 80
       targetPort: 80
