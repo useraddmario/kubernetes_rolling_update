@@ -1,59 +1,38 @@
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: todo-namespace
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: todo-namespace
   name: todo-deploy
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/name: todo-app
-  replicas: 5
+      app: todo-app
+  replicas: 3
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: todo-app
+        app: todo-app
     spec:
       containers:
-      - image: useraddmario/todo
-        imagePullPolicy: Always
-        name: todo-app
-        ports:
-        - containerPort: 80
+        - name: todo-app
+          image: 089634162715.dkr.ecr.us-west-2.amazonaws.com/capstone:latest
+          imagePullPolicy: "Always"
+          ports:
+            - name: todo-http
+              containerPort: 80
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: todo-namespace
   name: todo-svc
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: external
+    service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
+    service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
 spec:
+  selector:
+    app: simple-web-app
   ports:
     - port: 80
       targetPort: 80
-      protocol: TCP
-  type: NodePort
-  selector:
-    app.kubernetes.io/name: todo-app
----
-apiVersion: networking.k8s.io/v1beta1
-kind: Ingress
-metadata:
-  namespace: todo-namespace
-  name: todo-ingress
-  annotations:
-    kubernetes.io/ingress.class: alb
-    alb.ingress.kubernetes.io/scheme: internet-facing
-    alb.ingress.kubernetes.io/target-type: ip
-spec:
-  rules:
-    - http:
-        paths:
-          - path: /*
-            backend:
-              serviceName: todo-svc
-              servicePort: 80
+  type: LoadBalancer
+
