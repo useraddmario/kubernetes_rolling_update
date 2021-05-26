@@ -1,11 +1,36 @@
 version: 2.1
-
 orbs:
+  aws-ecr: circleci/aws-ecr@7.0.0
   aws-eks: circleci/aws-eks@1.1.0
   kubernetes: circleci/kubernetes@0.12.0
-
 jobs:
-  test-cluster:
+  lint:
+    docker:
+      - image: python:3.7.3-stretch
+    working_directory: ~/repo
+    steps:
+      - checkout
+      #- restore_cache:
+      #    keys:
+      #      - v1-dependencies-{{ checksum "requirements.txt" }}
+      #      - v1-dependencies-
+      - run:
+          name: install dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            make install
+      - save_cache:
+          paths:
+            - ./venv
+          key: v1-dependencies-{{ checksum "requirements.txt" }}
+      # run lint!
+      - run:
+          name: run lint
+          command: |
+            . venv/bin/activate
+            make lint 
+  create-deployment:
     executor: aws-eks/python3
     parameters:
       cluster-name:
@@ -13,28 +38,48 @@ jobs:
           Name of the EKS cluster
         type: string
     steps:
-      - kubernetes/install
+      - checkout
       - aws-eks/update-kubeconfig-with-authenticator:
           cluster-name: << parameters.cluster-name >>
-      - run:
-          command: |
-            kubectl get services
-          name: Test cluster
+          install-kubectl: true
+      - kubernetes/create-or-update-resource:
+          get-rollout-status: true
+          resource-file-path: deploy/todo.yml
+          resource-name: deployment/todo-deployment
 
 
 workflows:
   build_deploy_update:
     jobs:
-      - aws-eks/create-cluster:
-          cluster-name: my-eks-demo
+      - lint
+      - aws-ecr/build-and-push-image:
+          name: build_and_push
+          account-url: AWS_ECR_ACCOUNT_URL
+          region: AWS_DEFAULT_REGION 
+          aws-access-key-id: AWS_ACCESS_KEY_ID
+          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
           context: aws
-      - test-cluster:
-          cluster-name: my-eks-demo
+          create-repo: true
+          dockerfile: Dockerfile
+          no-output-timeout: 10m
+          path: ~/project
+          repo: capstone
+          skip-when-tags-exist: false
+          tag: ${CIRCLE_SHA1}
+          requires:
+            - lint
+      - aws-eks/create-cluster:
+          cluster-name: capstone-cluster
+          context: aws
+          requires:
+            - build-and-push-image
+      - create-deployment:
+          cluster-name: capstone-cluster
           requires:
             - aws-eks/create-cluster
           context: aws
-      - aws-eks/delete-cluster:
-          cluster-name: my-eks-demo
-          requires:
-            - test-cluster
-          context: aws
+      #- aws-eks/delete-cluster:
+          #cluster-name: capstone-cluster
+          #requires:
+          #  - deploy-to-cluster
+          #context: aws
