@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: todo-app
-          image: 089634162715.dkr.ecr.us-west-2.amazonaws.com/capstone:"${CIRCLE_SHA1}"
+          image: 089634162715.dkr.ecr.us-west-2.amazonaws.com/capstone:latest
           imagePullPolicy: "Always"
           ports:
             - name: todo-http

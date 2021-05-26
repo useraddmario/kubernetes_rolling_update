@@ -65,7 +65,7 @@ workflows:
           path: ~/project
           repo: capstone
           skip-when-tags-exist: false
-          tag: ${CIRCLE_SHA1}
+          tag: ${CIRCLE_SHA1},latest
           requires:
             - lint
       - aws-eks/create-cluster:
