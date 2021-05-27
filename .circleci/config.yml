@@ -44,8 +44,14 @@ jobs:
           install-kubectl: true
       - kubernetes/create-or-update-resource:
           get-rollout-status: true
-          resource-file-path: deploy/todo.yml
-          resource-name: deployment/todo-deploy
+          show-kubectl-command: true
+          resource-file-path: deploy/sample-deployment.yaml
+          resource-name: deployment/sample-webapp
+      - kubernetes/create-or-update-resource:
+          get-rollout-status: true
+          show-kubectl-command: true
+          resource-file-path: deploy/sample-service.yaml
+          resource-name: service/sample-webapp
 
 
 workflows:
@@ -70,7 +76,6 @@ workflows:
             - lint
       - aws-eks/create-cluster:
           cluster-name: capstone-cluster
-          show-eksctl-command: true
           context: aws
           requires:
             - build-and-push
