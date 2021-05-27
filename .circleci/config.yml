@@ -48,7 +48,7 @@ jobs:
           resource-file-path: deploy/sample-deployment.yaml
           resource-name: deployment/sample-webapp
       - kubernetes/create-or-update-resource:
-          get-rollout-status: true
+          get-rollout-status: false
           show-kubectl-command: true
           resource-file-path: deploy/sample-service.yaml
           resource-name: service/sample-webapp
