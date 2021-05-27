@@ -1,34 +1,35 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: todo-deploy
-spec:
-  selector:
-    matchLabels:
-      app: todo-app
-  replicas: 2
-  template:
-    metadata:
-      labels:
-        app: todo-app
-    spec:
-      containers:
-        - name: todo-app
-          image: 089634162715.dkr.ecr.us-west-2.amazonaws.com/capstone:latest
-          imagePullPolicy: "Always"
-          ports:
-            - name: todo-http
-              containerPort: 80
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: todo-svc
+  name: sample-service
 spec:
-  selector:
-    app: todo-app
   ports:
     - port: 80
       targetPort: 80
+      protocol: TCP
   type: LoadBalancer
-
+  selector:
+    app: nginx
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sample-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: 089634162715.dkr.ecr.us-west-2.amazonaws.com/capstone:latest
+          imagePullPolicy: "Always"
+          ports:
+            - name: http
+              containerPort: 80
