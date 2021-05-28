@@ -39,7 +39,7 @@ jobs:
           name: Check for existing cluster
           command: |
             # Install dependencies
-            ./deploy/awscli.sh
+            sudo deploy/awscli.sh
             # Check for existing cluster
             cluster=$(aws eks list-clusters --output text | awk '{print $2}')
 
