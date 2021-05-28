@@ -107,7 +107,7 @@ workflows:
       - create-deployment:
           cluster-name: capstone-cluster
           requires:
-            - aws-eks/create-cluster
+            - create-cluster
           context: aws
       #- aws-eks/delete-cluster:
           #cluster-name: capstone-cluster
