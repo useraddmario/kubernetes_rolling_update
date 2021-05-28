@@ -30,6 +30,26 @@ jobs:
           command: |
             . venv/bin/activate
             make lint 
+  create-cluster:
+    docker:
+      - image: ubuntu:latest
+    steps:
+      - run:
+          name: Check for existing cluster
+          command: |
+            # Install dependencies
+            ./deploy/awscli.sh
+            # Check for existing cluster
+            cluster=$(aws eks list-clusters --output text | awk '{print $2}')
+
+            if [ $cluster = "" ]; then
+              eksctl create cluster -f deploy/cluster.yaml
+            else
+              exit 0
+            fi
+            # Configure kubectl
+            #aws eks update-kubeconfig --name $cluster
+            # 
   create-deployment:
     executor: aws-eks/python3
     parameters:
@@ -74,11 +94,16 @@ workflows:
           tag: ${CIRCLE_SHA1},latest
           requires:
             - lint
-      - aws-eks/create-cluster:
-          cluster-name: capstone-cluster
-          context: aws
+#      - aws-eks/create-cluster:
+#          cluster-name: capstone-cluster
+#          show-eksctl-command: true
+#          context: aws
+#          requires:
+#            - build-and-push
+      - create-cluster:
           requires:
             - build-and-push
+          context: aws
       - create-deployment:
           cluster-name: capstone-cluster
           requires:
