@@ -34,6 +34,7 @@ jobs:
     docker:
       - image: ubuntu:latest
     steps:
+      - checkout
       - run:
           name: Check for existing cluster
           command: |
