@@ -9,8 +9,7 @@ unzip awscliv2.zip
 
 # Install eksctl
 mkdir -p eksctl_download
-curl --silent --location --retry 5 "https://github.com/weaveworks/eksctl/releases/download/latest_release/eksctl_$(uname -s)_amd64.tar.gz"
-tar xz -C eksctl_download
+curl --silent --location --retry 5 "https://github.com/weaveworks/eksctl/releases/download/latest_release/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C eksctl_download
 chmod +x eksctl_download/eksctl
 mv eksctl_download/eksctl /usr/local/bin/
 
