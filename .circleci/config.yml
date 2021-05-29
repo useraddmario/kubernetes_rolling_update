@@ -10,10 +10,6 @@ jobs:
     working_directory: ~/repo
     steps:
       - checkout
-      #- restore_cache:
-      #    keys:
-      #      - v1-dependencies-{{ checksum "requirements.txt" }}
-      #      - v1-dependencies-
       - run:
           name: install dependencies
           command: |
@@ -24,7 +20,6 @@ jobs:
           paths:
             - ./venv
           key: v1-dependencies-{{ checksum "requirements.txt" }}
-      # run lint!
       - run:
           name: run lint
           command: |
@@ -32,38 +27,37 @@ jobs:
             make lint 
   create-cluster:
     docker:
-      - image: ubuntu:latest
+      - image: cimg/python:3.9.5
     steps:
       - checkout
       - run:
           name: Check for existing cluster
           command: |
             apt update && apt -y install curl unzip wget
-
             # Install awscli
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            unzip awscliv2.zip
-            ./aws/install
+            wget -q https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
+            sudo unzip awscli-exe-linux-x86_64.zip
+            sudo ./aws/install
             # Install eksctl
-            wget -q https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_Linux_amd64.tar.gz
-            tar -xfz eksctl_Linux_amd64.tar.gz
-            chmod +x eksctl
-            mv ./eksctl /usr/local/bin/
+            curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+            sudo mv /tmp/eksctl /usr/local/bin
             # Install kubectl
-            curl -LO https://storage.googleapis.com/kubernetes-release/release/$KUBECTL_VERSION/bin/$PLATFORM/amd64/kubectl
-            chmod +x ./kubectl
-            mv ./kubectl /usr/local/bin
+            wget https://amazon-eks.s3.us-west-2.amazonaws.com/1.19.6/2021-01-05/bin/linux/amd64/kubectl
+            sudo chmod +x ./kubectl
+            sudo mv ./kubectl /usr/local/bin
+            # Test installs
+            aws s3 ls
             # Check for existing cluster
             cluster=$(aws eks list-clusters --output text | awk '{print $2}')
-
-            if [ $cluster = "" ]; then
+            pwd
+            ls -lah
+            if [ "$cluster" == "" ]; then
               eksctl create cluster -f deploy/cluster.yaml
+              aws eks update-kubeconfig --name $cluster
             else
+              echo "test"
               exit 0
             fi
-            # Configure kubectl
-            #aws eks update-kubeconfig --name $cluster
-            # 
   create-deployment:
     executor: aws-eks/python3
     parameters:
