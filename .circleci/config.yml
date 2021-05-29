@@ -1,4 +1,8 @@
 version: 2.1
+parameters:
+  cluster-name:
+    type: string
+    default: "capstone-cluster"
 orbs:
   aws-ecr: circleci/aws-ecr@7.0.0
   aws-eks: circleci/aws-eks@1.1.0
@@ -52,6 +56,7 @@ jobs:
             pwd
             ls -lah
             if [ "$cluster" == "" ]; then
+              cluster=<< pipeline.parameters.cluster-name >>
               eksctl create cluster -f deploy/cluster.yaml
               aws eks update-kubeconfig --name $cluster
             else
@@ -60,15 +65,10 @@ jobs:
             fi
   create-deployment:
     executor: aws-eks/python3
-    parameters:
-      cluster-name:
-        description: |
-          Name of the EKS cluster
-        type: string
     steps:
       - checkout
       - aws-eks/update-kubeconfig-with-authenticator:
-          cluster-name: << parameters.cluster-name >>
+          cluster-name: << pipeline.parameters.cluster-name >>
           install-kubectl: true
       - kubernetes/create-or-update-resource:
           get-rollout-status: true
@@ -102,18 +102,11 @@ workflows:
           tag: ${CIRCLE_SHA1},latest
           requires:
             - lint
-#      - aws-eks/create-cluster:
-#          cluster-name: capstone-cluster
-#          show-eksctl-command: true
-#          context: aws
-#          requires:
-#            - build-and-push
       - create-cluster:
           requires:
             - build-and-push
           context: aws
       - create-deployment:
-          cluster-name: capstone-cluster
           requires:
             - create-cluster
           context: aws

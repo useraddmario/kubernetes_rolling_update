@@ -15,7 +15,7 @@ spec:
       containers:
         - name: sample-webapp
           image: 089634162715.dkr.ecr.us-west-2.amazonaws.com/capstone:latest
-          imagePullPolicy: "Always"
+          #imagePullPolicy: "Always"
           ports:
             - name: http
               containerPort: 80
