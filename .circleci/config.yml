@@ -53,14 +53,12 @@ jobs:
             aws s3 ls
             # Check for existing cluster
             cluster=$(aws eks list-clusters --output text | awk '{print $2}')
-            pwd
-            ls -lah
             if [ "$cluster" == "" ]; then
               cluster=<< pipeline.parameters.cluster-name >>
               eksctl create cluster -f deploy/cluster.yaml
               aws eks update-kubeconfig --name $cluster
+              kubectl version
             else
-              echo "test"
               exit 0
             fi
   create-deployment:
@@ -80,7 +78,10 @@ jobs:
           show-kubectl-command: true
           resource-file-path: deploy/sample-service.yaml
           resource-name: service/sample-webapp
-
+      - run:
+          name: Check for existing cluster
+          command: |
+            curl $(kubectl get service | grep sample | awk '{print $4}') 
 
 workflows:
   build_deploy_update:
