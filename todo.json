@@ -1,18 +1,18 @@
 {
     "Mario_Rodriguez": {
         "personal": [
-            "[ ] Wake up early",
+            "[ ]Wake up early",
             "[ ]Exercise",
             "[ ]Get a life"
         ],
         "work": [
-            "[ ]Create local dev environment",
-            "[ ]Create tiny microservice",
-            "[ ]Build docker container",
-            "[ ]Create AWS ECR repo with default scanning",
-            "[ ]Deploy container to ECR repo",
-            "[ ]Create pipeline to build, test and upload",
-            "[ ]Deploy to Kubernetes",
+            "[X]Create local dev environment",
+            "[X]Create tiny microservice",
+            "[X]Build docker container",
+            "[X]Create AWS ECR repo with default scanning",
+            "[X]Deploy container to ECR repo",
+            "[X]Create pipeline to build, test and upload",
+            "[X]Deploy to Kubernetes",
             "[ ]Profit"
 
         ]
