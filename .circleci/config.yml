@@ -79,7 +79,7 @@ jobs:
           resource-file-path: deploy/sample-service.yaml
           resource-name: service/sample-webapp
       - run:
-          name: Check for existing cluster
+          name: Get app response
           command: |
             curl $(kubectl get service | grep sample | awk '{print $4}') 
 

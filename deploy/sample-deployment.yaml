@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: sample-webapp
-          image: 089634162715.dkr.ecr.us-west-2.amazonaws.com/capstone:latest
+          image: 089634162715.dkr.ecr.us-west-2.amazonaws.com/capstone:${CIRCLE_SHA1}
           #imagePullPolicy: "Always"
           ports:
             - name: http
