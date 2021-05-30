@@ -85,6 +85,7 @@ jobs:
       - run:
           name: Get app response
           command: |
+            sleep 180
             curl $(kubectl get service | grep sample | awk '{print $4}') 
 
 workflows:
