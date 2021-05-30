@@ -68,6 +68,10 @@ jobs:
       - aws-eks/update-kubeconfig-with-authenticator:
           cluster-name: << pipeline.parameters.cluster-name >>
           install-kubectl: true
+      - run:
+          name: Add Circle_SHA1 to sample.yaml
+          command: |
+            sed -i "s/circlesha/${CIRCLE_SHA1}/" deploy/sample-deployment.yaml
       - kubernetes/create-or-update-resource:
           get-rollout-status: true
           show-kubectl-command: true
