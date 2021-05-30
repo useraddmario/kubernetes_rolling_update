@@ -3,10 +3,6 @@ import json
 
 app = Flask(__name__)
 
-# Fail linting
-with open('todo.json') as todo:
-    tasks = json.load(todo_error)
-
 with open('todo.json') as todo:
     tasks = json.load(todo)
 
