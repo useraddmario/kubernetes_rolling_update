@@ -1,3 +1,5 @@
-# kubernetes_rolling_update
+# Kubernetes_Rolling_Update
 
-test
+A project to demonstrate a CircleCI pipeline building, linting, and deploying a Docker image to an AWS Kubernetes cluster with external access configured.
+
+
